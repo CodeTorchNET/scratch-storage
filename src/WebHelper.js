@@ -111,6 +111,7 @@ class WebHelper extends Helper {
                 if (reqConfig === false) {
                     return tryNextSource();
                 }
+                reqConfig.credentials = 'include'; //send credentials along requests for auth purposes
 
                 return tool.get(reqConfig)
                     .then(body => {

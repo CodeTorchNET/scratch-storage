@@ -172,13 +172,14 @@ class ScratchStorage {
      * @param {AssetType} assetType - The type of asset to fetch. This also determines which asset store to use.
      * @param {string} assetId - The ID of the asset to fetch: a project ID, MD5, etc.
      * @param {DataFormat} [dataFormat] - Optional: load this format instead of the AssetType's default.
+     * @param {string} [token] - Optional: a token to use for authentication with the asset source.
      * @return {Promise.<Asset>} A promise for the requested Asset.
      *   If the promise is resolved with non-null, the value is the requested asset.
      *   If the promise is resolved with null, the desired asset could not be found with the current asset sources.
      *   If the promise is rejected, there was an error on at least one asset source. HTTP 404 does not count as an
      *   error here, but (for example) HTTP 403 does.
      */
-    load (assetType, assetId, dataFormat) {
+    load (assetType, assetId, dataFormat, token = '') {
         /** @type {Helper[]} */
         const helpers = this._helpers.map(x => x.helper);
         const errors = [];
@@ -194,7 +195,7 @@ class ScratchStorage {
             helper = helpers[helperIndex++];
 
             if (helper) {
-                const loading = helper.load(assetType, assetId, dataFormat);
+                const loading = helper.load(assetType, assetId, dataFormat, token);
                 if (loading === null) {
                     return tryNextHelper();
                 }

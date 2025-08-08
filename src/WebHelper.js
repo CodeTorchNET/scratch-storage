@@ -80,9 +80,9 @@ class WebHelper extends Helper {
      * @param {string} assetId - The ID of the asset to fetch: a project ID, MD5, etc.
      * @param {DataFormat} dataFormat - The file format / file extension of the asset to fetch: PNG, JPG, etc.
      * @return {Promise.<Asset>} A promise for the contents of the asset.
+     * @param {string} [token=''] - An optional token to use for authentication.
      */
-    load (assetType, assetId, dataFormat) {
-
+    load (assetType, assetId, dataFormat, token = '') {
         /** @type {Array.<{url:string, result:*}>} List of URLs attempted & errors encountered. */
         const errors = [];
         const stores = this.stores.slice()
@@ -111,8 +111,14 @@ class WebHelper extends Helper {
                 if (reqConfig === false) {
                     return tryNextSource();
                 }
-                reqConfig.credentials = 'include'; //send credentials along requests for auth purposes
+                reqConfig.credentials = 'include'; // send credentials along requests for auth purposes
 
+                if (token && token !== ''){
+                    reqConfig.headers = {
+                        ...reqConfig.headers,
+                        Authorization: `Bearer ${token}`
+                    };
+                }
                 return tool.get(reqConfig)
                     .then(body => {
                         if (body) {

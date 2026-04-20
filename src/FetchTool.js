@@ -1,4 +1,3 @@
-const {scratchFetch} = require('./scratchFetch');
 const saferFetch = require('./safer-fetch');
 const isNullResponse = require('./isNullResponse');
 
@@ -48,11 +47,15 @@ class FetchTool {
      * @returns {Promise.<string>} Server returned metadata.
      */
     send ({url, withCredentials = false, ...options}) {
-        return scratchFetch(url, Object.assign({
+        const fetchOptions = Object.assign({
             credentials: withCredentials ? 'include' : 'omit'
-        }, options))
+        }, options);
+
+        return saferFetch(url, fetchOptions)
             .then(response => {
                 if (response.ok) return response.text();
+                // saferFetch can reject with an Error object. Pass it through.
+                if (response instanceof Error) return Promise.reject(response);
                 return Promise.reject(response.status);
             });
     }
